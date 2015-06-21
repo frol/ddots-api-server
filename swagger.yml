@@ -1,0 +1,826 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+info:
+  version: "2.0.0"
+  title: Dots (Distributed Olympiad Testing System) API
+
+host: dots.org.ua
+schemes:
+  - http
+  - https
+basePath: /v2
+produces:
+  - application/json
+
+security:
+  - DOTS_API_KEY: []
+
+securityDefinitions:
+  DOTS_API_KEY:
+    type: apiKey
+    in: header
+    name: DOTS_API_KEY
+    description: |
+      You can get it via *POST /session/*
+
+paths:
+
+  /users:
+    get:
+      summary: |
+        List of users
+      description: |
+        Returns a limited by *limit* parameter list of users.
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          description: |
+            Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          description: |
+            Number of items to retrieve. Default is 20, maximum is 100.
+      responses:
+        200:
+          description: |
+            List of users
+          schema:
+            $ref: '#/definitions/users'
+    post:
+      description: |
+        Create a new user
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: username
+          in: formData
+          required: true
+          type: string
+        - name: email
+          in: formData
+          required: true
+          type: string
+          format: email
+        - name: recaptcha_key
+          in: formData
+          required: true
+          type: string
+      responses:
+        200:
+          description: |
+            New user is created
+
+  /users/new:
+    get:
+      summary: |
+        Sign up user form
+      description: |
+        Returns a "registration form". At the time of this writing, it is only
+        reCAPTCHA server key passed.
+      responses:
+        200:
+          description: |
+            Sign up form data
+          schema:
+            type: object
+            properties:
+              recaptcha_server_key:
+                type: string
+  
+  /users/me:
+    get:
+      summary: |
+        Returns information about the current user
+      description: |
+        Use */users/{user_id}/** for everything else, e.g. update profile.
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: |
+            Information about the current user
+          schema:
+            $ref: '#/definitions/user_details'
+
+  /users/{user_id}:
+    get:
+      summary: |
+        Find user by ID
+      parameters:
+        - name: user_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: |
+            Information about the user
+          schema:
+            $ref: '#/definitions/user_details'
+        403:
+          description: |
+            You don't have permissions to see details about this user
+        404:
+          description: |
+            User not found
+    patch:
+      summary: |
+        Update user info
+      description: |
+        It only updates provided fields
+      parameters:
+        - name: user_id
+          in: path
+          type: integer
+        - name: email
+          in: formData
+          type: string
+          format: email
+        - name: first_name
+          in: formData
+          type: string
+        - name: last_name
+          in: formData
+          type: string
+        - name: new_password
+          in: formData
+          type: string
+          format: password
+        - name: password
+          in: formData
+          required: true
+          type: string
+          format: password
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: |
+        Remove user
+      description: |
+        [admins only]
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: user_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: OK
+
+  /sessions:
+    post:
+      summary: |
+        Sign in
+      parameters:
+        - name: username_or_email
+          in: formData
+          type: string
+        - name: password
+          in: formData
+          type: string
+          format: password
+        - name: recaptcha_key
+          description: |
+            You need to get *recaptcha_server_key* from */sessions/new*, submit
+            reCAPTCHA check and provide *recaptcha_key* received from there
+          in: formData
+          type: string
+      responses:
+        200:
+          description: |
+            You are successfully signed in
+          schema:
+            type: object
+            properties:
+              auth_token:
+                type: string
+    delete:
+      summary: |
+        Logout
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: |
+            You are logged out
+
+  /sessions/new:
+    get:
+      summary: |
+        Sign in form
+      responses:
+        200:
+          description: |
+            Sign in form data
+          schema:
+            properties:
+              recaptcha_server_key:
+                type: string
+
+  /teams:
+    get:
+      summary: |
+        List of teams
+      description: |
+        Returns a limited by *limit* parameter list of teams.
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          description: |
+            Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          description: |
+            Number of items to retrieve. Default is 20, maximum is 100.
+      responses:
+        200:
+          description: |
+            List of teams
+          schema:
+            $ref: '#/definitions/teams'
+    post:
+      summary: |
+        Create a new team
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: title
+          in: formData
+          required: true
+          type: string
+        - name: members
+          in: formData
+          required: true
+          type: array
+          items:
+            type: integer
+          description: |
+            List of user IDs which need to be added to the team
+      responses:
+        200:
+          description: |
+            New team is created
+
+  /teams/{team_id}:
+    get:
+      summary: |
+        Find team by ID
+      parameters:
+        - name: team_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: |
+            Information about the team
+          schema:
+            $ref: '#/definitions/team_details'
+        403:
+          description: |
+            You don't have permissions to see details about this team
+        404:
+          description: |
+            Team not found
+    patch:
+      summary: |
+        Update team info
+      description: |
+        It only updates provided fields
+      parameters:
+        - name: team_id
+          in: path
+          type: integer
+        - name: title
+          in: formData
+          required: true
+          type: string
+        - name: members
+          in: formData
+          type: array
+          items:
+            type: integer
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: |
+        Remove the team
+      description: |
+        [admins only]
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: team_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: OK
+
+  /problems:
+    get:
+      summary: |
+        List of problems
+      description: |
+        Returns a limited by *limit* parameter list of problems.
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          description: |
+            Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          description: |
+            Number of items to retrieve. Default is 20, maximum is 100.
+      responses:
+        200:
+          description: |
+            List of problems
+          schema:
+            $ref: '#/definitions/problems'
+    post:
+      summary: |
+        Create a new problem
+      description: |
+        [admin only]
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: title
+          in: formData
+          required: true
+          type: string
+        - name: text
+          in: formData
+          required: true
+          type: string
+      responses:
+        200:
+          description: |
+            New problem is created
+
+  /problems/{problem_id}:
+    get:
+      summary: |
+        Find problem by ID
+      parameters:
+        - name: problem_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: |
+            Information about the problem
+          schema:
+            $ref: '#/definitions/problem_details'
+        403:
+          description: |
+            You don't have permissions to see details about this problem
+        404:
+          description: |
+            Problem not found
+    patch:
+      summary: |
+        Update problem info
+      description: |
+        It only updates provided fields
+        [admins only]
+      parameters:
+        - name: problem_id
+          in: path
+          type: integer
+        - name: title
+          in: formData
+          required: true
+          type: string
+        - name: text
+          in: formData
+          type: string
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: |
+        Remove the problem
+      description: |
+        [admins only]
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: problem_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: OK
+
+  
+  /contests:
+    get:
+      summary: |
+        List of contests
+      description: |
+        Returns a limited by *limit* parameter list of contests.
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          format: int32
+          description: |
+            Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          description: |
+            Number of items to retrieve. Default is 20, maximum is 100.
+      responses:
+        200:
+          description: |
+            List of contests
+          schema:
+            $ref: '#/definitions/contests'
+    post:
+      summary: TODO
+      description: TODO
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: OK
+        403:
+          description: Forbidden
+    delete:
+      summary: TODO
+      description: TODO
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: OK
+        403:
+          description: Forbidden
+    put:
+      summary: TODO
+      description: TODO
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: OK
+        403:
+          description: Forbidden
+    patch:
+      summary: TODO
+      description: TODO
+      security:
+        - DOTS_API_KEY: []
+      responses:
+        200:
+          description: OK
+        403:
+          description: Forbidden
+  
+  /contests/{contest_id}:
+    get:
+      summary: |
+        Info about the contest
+      parameters:
+        - name: contest_id
+          in: path
+          description: |
+            Unique contest id
+          type: integer
+      
+      responses:
+        200:
+          description: |
+            Information about the contest
+          schema:
+            $ref: '#/definitions/contest_details'
+
+  /contests/{contest_id}/contestants:
+    get:
+      summary: |
+        List of contestants of the given contest
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: participation_type
+          in: query
+          type: string
+          enum:
+            - online
+            - onsite
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/teams'
+    post:
+      summary: |
+        Join the contest
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: team_id
+          in: formData
+          description: |
+            [admin only]
+          type: integer
+      responses:
+        200:
+          description: OK
+        403:
+          description: |
+            The team is not allowed to join the contest
+    delete:
+      summary: |
+        Leave the contest
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: team_id
+          in: formData
+          description: |
+            [admin only]
+          type: integer
+      responses:
+        200:
+          description: OK
+        403:
+          description: |
+            The team is not allowed to leave the contest
+            (either not enough permissions or contest is started)
+
+  /contests/{contest_id}/problems:
+    get:
+      summary: |
+        List of problems of the given contest
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/contest_problems'
+    post:
+      summary: |
+        Add problem to the contest
+        [admin only]
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: problem_id
+          in: formData
+          type: integer
+      responses:
+        200:
+          description: OK
+        403:
+          description: |
+            You are not allowed to add the problem to the contest
+    delete:
+      summary: |
+        Remove the problem from the contest
+        [admin only]
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: problem_id
+          in: formData
+          type: integer
+      responses:
+        200:
+          description: OK
+        403:
+          description: |
+            You are not allowed to add the problem to the contest
+            (either not enough permissions or contest is finished)
+
+  /contests/{contest_id}/standings:
+    get:
+      summary: |
+        Table of standings of the given contest
+      parameters:
+        - name: contest_id
+          in: path
+          type: integer
+        - name: participation_type
+          in: query
+          type: string
+          enum:
+            - online
+            - onsite
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/standings'
+
+
+definitions:
+  user:
+    type: object
+    required:
+      - id
+      - username
+      - first_name
+      - last_name
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+    example:
+      id: 1
+      username: root
+  user_details:
+    allOf:
+      - $ref: '#/definitions/user'
+      - type: object
+        properties:
+          email:
+            type: string
+            format: email
+          teams:
+            $ref: '#/definitions/teams'
+          contests:
+            $ref: '#/definitions/contests'
+  users:
+    type: array
+    items:
+      $ref: '#/definitions/user'
+
+  team:
+    type: object
+    required:
+      - id
+      - title
+      - participation_type
+      - members
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      participation_type:
+        type: string
+        enum:
+          - online
+          - onsite
+      members:
+        $ref: '#/definitions/users'
+  team_details:
+    allOf:
+      - $ref: '#/definitions/team'
+      - type: object
+        properties:
+          contests:
+            $ref: '#/definitions/contests'
+  teams:
+    type: array
+    items:
+      $ref: '#/definitions/team'
+      
+  problem:
+    type: object
+    required:
+      - id
+      - title
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+  problem_details:
+    allOf:
+      - $ref: '#/definitions/problem'
+      - type: object
+        required:
+          - text
+        properties:
+          text:
+            type: string
+  problems:
+    type: array
+    items:
+      $ref: '#/definitions/problem'
+
+  contest_problem:
+    allOf:
+      - $ref: '#/definitions/problem'
+      - type: object        
+        required:
+          - short_title
+        properties:
+          short_title:
+            type: string
+  contest_problems:
+    type: array
+    items:
+      $ref: '#/definitions/contest_problem'
+  contest:
+    type: object
+    required:
+      - id
+      - title
+      - type
+      - status
+      - start_time
+      - duration
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+        enum:
+          - ACM
+          - other
+      status:
+        type: string
+        enum:
+          - hidden
+          - new
+          - running
+          - finished
+      start_time:
+        type: string
+        format: date-time
+      duration:
+        type: integer
+        description: |
+          (minutes)
+      is_joined:
+        type: boolean
+  contest_details:
+    allOf:
+      - $ref: '#/definitions/contest'
+      - type: object
+        required:
+          - description
+        properties:
+          registration_type:
+            type: string
+            enum:
+              - open
+              - premoderation
+          description:
+            type: string
+  contests:
+    type: array
+    items:
+      $ref: '#/definitions/contest'
+  
+  standings_approached_problem:
+    type: object
+    required:
+      - status
+      - display_status
+      - relative_time
+    properties:
+      status:
+        type: string
+        enum:
+          - solved
+          - partially_solved
+      display_status:
+        type: string
+      relative_time:
+        type: integer
+        description: |
+          Last solution submition in minutes since contest started
+  standings:
+    type: array
+    items:
+      type: object
+      properties:
+        team:
+          $ref: '#/definitions/team'
+        approached_problems:
+          type: object
+          additionalProperties:
+            $ref: '#/definitions/standings_approached_problem'
