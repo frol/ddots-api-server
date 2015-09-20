@@ -112,6 +112,7 @@ paths:
       parameters:
         - name: user_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -133,6 +134,7 @@ paths:
       parameters:
         - name: user_id
           in: path
+          required: true
           type: integer
         - name: email
           in: formData
@@ -166,6 +168,7 @@ paths:
       parameters:
         - name: user_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -274,6 +277,7 @@ paths:
       parameters:
         - name: team_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -295,6 +299,7 @@ paths:
       parameters:
         - name: team_id
           in: path
+          required: true
           type: integer
         - name: title
           in: formData
@@ -318,6 +323,7 @@ paths:
       parameters:
         - name: team_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -374,6 +380,7 @@ paths:
       parameters:
         - name: problem_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -396,6 +403,7 @@ paths:
       parameters:
         - name: problem_id
           in: path
+          required: true
           type: integer
         - name: title
           in: formData
@@ -417,6 +425,7 @@ paths:
       parameters:
         - name: problem_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -496,6 +505,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           description: |
             Unique contest id
           type: integer
@@ -507,13 +517,14 @@ paths:
           schema:
             $ref: '#/definitions/contest_details'
 
-  /contests/{contest_id}/contestants:
+  /contests/{contest_id}/teams:
     get:
       summary: |
         List of contestants of the given contest
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: participation_type
           in: query
@@ -532,6 +543,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: team_id
           in: formData
@@ -550,6 +562,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: team_id
           in: formData
@@ -571,6 +584,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
       responses:
         200:
@@ -584,6 +598,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: problem_id
           in: formData
@@ -601,6 +616,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: problem_id
           in: formData
@@ -620,6 +636,7 @@ paths:
       parameters:
         - name: contest_id
           in: path
+          required: true
           type: integer
         - name: participation_type
           in: query
