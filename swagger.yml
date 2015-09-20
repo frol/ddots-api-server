@@ -431,6 +431,131 @@ paths:
         200:
           description: OK
 
+
+  /solutions:
+    get:
+      summary: |
+        List of solutions
+      description: |
+        Returns a limited by *limit* parameter list of solutions ordered from
+        recent to old.
+      parameters:
+        - name: author_id
+          in: query
+          type: integer
+        - name: team_id
+          in: query
+          type: integer
+        - name: contest_id
+          in: query
+          type: integer
+        - name: programming_language_id
+          in: query
+          type: integer
+        - name: offset
+          in: query
+          type: integer
+          description: |
+            Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          description: |
+            Number of items to retrieve. Default is 10, maximum is 100.
+      responses:
+        200:
+          description: |
+            List of solutions
+          schema:
+            $ref: '#/definitions/solutions'
+        403:
+          description: |
+            You don't have permissions to see or filter by the specified
+            filtering.
+    post:
+      summary: |
+        Sumbit a new solution
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: contest_id
+          in: formData
+          required: true
+          type: integer
+        - name: problem_id
+          in: formData
+          required: true
+          type: integer
+        - name: programming_language_id
+          in: formData
+          required: true
+          type: integer
+        - name: solution_text
+          in: formData
+          type: string
+        - name: solution_file
+          in: formData
+          type: file
+      responses:
+        200:
+          description: |
+            New solutions is submited
+
+  /solution/{solution_id}:
+    get:
+      summary: |
+        Find solution by ID
+      parameters:
+        - name: solution_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: |
+            Information about the solution
+          schema:
+            $ref: '#/definitions/solution_details'
+        403:
+          description: |
+            You don't have permissions to see details about this solution
+        404:
+          description: |
+            Solution not found
+    patch:
+      summary: |
+        Update solution info
+      description: |
+        It only updates provided fields
+        You can re-jundge the solution by updating status to -1
+        [admins only]
+      parameters:
+        - name: solution_id
+          in: path
+          required: true
+          type: integer
+        - name: status
+          in: formData
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+    delete:
+      summary: |
+        Remove the solution
+      description: |
+        [admins only]
+      security:
+        - DOTS_API_KEY: []
+      parameters:
+        - name: solution_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
   
   /contests:
     get:
@@ -742,6 +867,33 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/problem'
+
+  solution:
+    type: object
+    required:
+      - id
+      - submition_time
+    properties:
+      id:
+        type: integer
+      submition_time:
+        type: string
+        format: date-time
+      status:
+        type: string
+  solution_details:
+    allOf:
+      - $ref: '#/definitions/solution'
+      - type: object
+        required:
+          - text
+        properties:
+          text:
+            type: string
+  solutions:
+    type: array
+    items:
+      $ref: '#/definitions/solution'
 
   contest_problem:
     allOf:
