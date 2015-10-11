@@ -8,6 +8,14 @@ We use Swagger.io to present an interactive documentation, so run the server
 and proceed to http://127.0.0.1:5000/v1/spec.html
 
 
+Clone the Project
+-----------------
+
+```bash
+$ git clone --recurse-submodules git@gitlab.prostoksi.com:ddots/ddots-api-server.git
+```
+
+
 Setup Environment
 -----------------
 
