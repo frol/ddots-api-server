@@ -8,9 +8,15 @@ import logging
 # access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-fileConfig(config.config_file_name)
+# Setup logging
+sqlalchemy_logger = logging.getLogger('sqlalchemy')
+if sqlalchemy_logger.level == logging.NOTSET:
+    sqlalchemy_logger.setLevel(logging.WARN)
+
+alembic_logger = logging.getLogger('alembic')
+if alembic_logger.level == logging.NOTSET:
+    alembic_logger.setLevel(logging.INFO)
+
 logger = logging.getLogger('alembic.env')
 
 # add your model's MetaData object here

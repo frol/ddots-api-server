@@ -1,0 +1,31 @@
+language: python
+python:
+  - "3.6"
+  - "nightly"
+
+matrix:
+  allow_failures:
+    - python: "nightly"
+
+branches:
+  only:
+    - master
+
+install:
+  - travis_retry pip install pylint
+  - travis_retry pip install -r requirements.txt
+  - travis_retry pip install -r tests/requirements.txt
+  - travis_retry pip install pytest-cov coverage coveralls codacy-coverage
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.pyenv
+
+script:
+  py.test --cov=app
+
+after_success:
+  - pylint app
+  - coveralls
+  - coverage xml && python-codacy-coverage -r coverage.xml

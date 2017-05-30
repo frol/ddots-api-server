@@ -1,12 +1,2 @@
-Flask
-#https://github.com/mitsuhiko/flask/archive/master.zip
-
-Flask-restful
-
-Flask-restplus
-#https://github.com/noirbizarre/flask-restplus/archive/master.zip
-
-Flask-SQLAlchemy
-Flask-alembic
-werkzeug==0.9.4
-Flask-OAuthlib>=0.5.0
+-r tasks/requirements.txt
+-r app/requirements.txt

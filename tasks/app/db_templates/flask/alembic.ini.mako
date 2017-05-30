@@ -11,18 +11,19 @@
 
 # Logging configuration
 [loggers]
-keys = root,sqlalchemy,alembic
+keys = sqlalchemy,alembic
+#keys = root,sqlalchemy,alembic
 
-[handlers]
-keys = console
+#[handlers]
+#keys = console
 
-[formatters]
-keys = generic
+#[formatters]
+#keys = generic
 
-[logger_root]
-level = WARN
-handlers = console
-qualname =
+#[logger_root]
+#level = WARN
+#handlers = console
+#qualname =
 
 [logger_sqlalchemy]
 level = WARN
@@ -34,12 +35,12 @@ level = INFO
 handlers =
 qualname = alembic
 
-[handler_console]
-class = StreamHandler
-args = (sys.stderr,)
-level = NOTSET
-formatter = generic
+#[handler_console]
+#class = StreamHandler
+#args = (sys.stderr,)
+#level = NOTSET
+#formatter = generic
 
-[formatter_generic]
-format = %(levelname)-5.5s [%(name)s] %(message)s
-datefmt = %H:%M:%S
+#[formatter_generic]
+#format = %(levelname)-5.5s [%(name)s] %(message)s
+#datefmt = %H:%M:%S

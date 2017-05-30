@@ -1,14 +1,16 @@
 # encoding: utf-8
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,wrong-import-position
 """
-The starting point of Invoke tasks for DDOTS RESTful API Server project.
+The starting point of Invoke tasks for Example RESTful API Server project.
 """
 
 import logging
 import os
+import platform
 import sys
 import sysconfig
 
+logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 #logging.getLogger('app').setLevel(logging.DEBUG)
@@ -21,8 +23,8 @@ else:
     formatter = colorlog.ColoredFormatter(
         (
             '%(asctime)s '
-            '[%(cyan)s%(name)s%(reset)s] '
             '[%(log_color)s%(levelname)s%(reset)s] '
+            '[%(cyan)s%(name)s%(reset)s] '
             '%(message_log_color)s%(message)s'
         ),
         reset=True,
@@ -45,12 +47,16 @@ else:
         style='%'
     )
 
-    handler = logging.StreamHandler()
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            break
+    else:
+        handler = logging.StreamHandler()
+        logger.addHandler(handler)
     handler.setFormatter(formatter)
-    logger.addHandler(handler)
 
- 
-from invoke import Collection
+
+from invoke import Collection, run, Failure
 from invoke.executor import Executor
 
 from . import app
@@ -69,6 +75,21 @@ def invoke_execute(context, command_name, **kwargs):
     return results[target_task]
 
 namespace.configure({
+    'run': {
+        'shell': '/bin/sh' if platform.system() != 'Windows' else os.environ.get('COMSPEC'),
+    },
     'root_namespace': namespace,
     'invoke_execute': invoke_execute,
 })
+
+if not os.environ.get('DDOTS_VERSION'):
+    try:
+        latest_git_tag = run(
+            'git describe --tags --abbrev=0',
+            hide=True,
+            shell=namespace.configuration()['run']['shell']
+        ).stdout.strip()
+    except Failure:
+        pass
+    else:
+        os.environ['DDOTS_VERSION'] = latest_git_tag

@@ -1,0 +1,60 @@
+# Download Docker images:
+#
+# $ docker-compose pull
+#
+#
+# Run:
+#
+# $ docker-compose up --build -d
+#
+#
+# View logs:
+#
+# $ docker-compose logs --follow
+#
+#
+# Access Swagger UI, interactive API documentation: http://127.0.0.1:5000/api/v1/
+#
+
+version: '2'
+services:
+  ddots-api-server:
+    build: ../
+    #image: frolvlad/ddots-api-server
+    ports:
+      - 5000:5000
+    environment:
+      - DDOTS_SEAWEEDFS_HOST=seaweedfs-master
+    links:
+      - seaweedfs-master
+      - seaweedfs-volume
+    #volumes:
+      # Uncomment the following line if you want local code auto-reload while developing
+      #- ../:/opt/www
+      # Uncomment the following lines if you want to persist DB across restarts
+      #- ../ddots.db:/opt/www/ddots.db
+
+  seaweedfs-master:
+    image: chrislusf/seaweedfs
+    # Uncomment the following lines if you need to access SeaweedFS Master
+    #ports:
+    #  - 9333:9333
+    command: "master"
+    # Uncomment the following lines if you want to persist data across restarts
+    #volumes:
+    #  - ./persistent/seaweedfs-master-data:/data
+
+  seaweedfs-volume:
+    restart: on-failure
+    image: chrislusf/seaweedfs
+    links:
+      - seaweedfs-master
+    # Uncomment the following lines if you need to access SeaweedFS Volume
+    #ports:
+    #  - 8888:8888
+    command: 'volume -max=5 -mserver="seaweedfs-master:9333" -port=8888'
+    depends_on:
+     - seaweedfs-master
+    # Uncomment the following lines if you want to persist data across restarts
+    #volumes:
+    #  - ./persistent/seaweedfs-volume-data:/data

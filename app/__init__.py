@@ -1,61 +1,64 @@
 # encoding: utf-8
-# pylint: disable=invalid-name
 """
-DDOTS RESTful API Server application.
+DDOTS RESTful API Server.
 """
+import logging
 import os
+import sys
 
-from flask import Flask, Blueprint
-from flask.ext.restplus import Api, Resource, fields
+import better_exceptions
+from flask import Flask
 
-app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % (
-    os.path.join(
-        os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-        "ddots.db"
-    )
-)
-
-class MigrateConfig(object):
-    def __init__(self, database, directory='migrations', **kwargs):
-        self.db = database
-        self.directory = directory
-        self.configure_args = kwargs
-
-api_v1 = Blueprint('api', __name__, url_prefix='/api/v1')
-api = Api(
-    api_v1,
-    version='1.0',
-    title="DDOTS API",
-    description="Dockerized Distributed Olympiad Testing System API",
-)
-app.register_blueprint(api_v1)
-
-api_errors_definitions = {
-    404: api.model(
-        'error_404',
-        {
-            'message': fields.String(required=True),
-        }
-    ),
+CONFIG_NAME_MAPPER = {
+    'development': 'config.DevelopmentConfig',
+    'testing': 'config.TestingConfig',
+    'production': 'config.ProductionConfig',
+    'local': 'local_config.LocalConfig',
 }
 
-def mount_modules():
-    from flask.ext.sqlalchemy import SQLAlchemy
-    db = SQLAlchemy(app)
-    app.extensions['migrate'] = MigrateConfig(db)
+def create_app(flask_config_name=None, **kwargs):
+    """
+    Entry point to the Flask RESTful Server application.
+    """
+    app = Flask(__name__, **kwargs)
 
-    #from . import auth
-    #auth.models.db.init_app(app)
-    #auth.views.oauth.init_app(app)
-    #app.register_blueprint(auth.views.auth_blueprint)
-    
-    from . import users
-    users.models.db.init_app(app)
-    
-    from . import problems
-    #problems.models.db.init_app(app)
+    env_flask_config_name = os.getenv('FLASK_CONFIG')
+    if not env_flask_config_name and flask_config_name is None:
+        flask_config_name = 'local'
+    elif flask_config_name is None:
+        flask_config_name = env_flask_config_name
+    else:
+        if env_flask_config_name:
+            assert env_flask_config_name == flask_config_name, (
+                "FLASK_CONFIG environment variable (\"%s\") and flask_config_name argument "
+                "(\"%s\") are both set and are not the same." % (
+                    env_flask_config_name,
+                    flask_config_name
+                )
+            )
 
+    try:
+        app.config.from_object(CONFIG_NAME_MAPPER[flask_config_name])
+    except ImportError:
+        if flask_config_name == 'local':
+            app.logger.error(
+                "You have to have `local_config.py` or `local_config/__init__.py` in order to use "
+                "the default 'local' Flask Config. Alternatively, you may set `FLASK_CONFIG` "
+                "environment variable to one of the following options: development, production, "
+                "testing."
+            )
+            sys.exit(1)
+        raise
 
-mount_modules()
+    if app.debug:
+        logging.getLogger('flask_oauthlib').setLevel(logging.DEBUG)
+        app.logger.setLevel(logging.DEBUG)
+
+    from . import extensions
+    extensions.init_app(app)
+
+    from . import modules
+    modules.init_app(app)
+
+    return app
