@@ -12,7 +12,7 @@ Clone the Project
 -----------------
 
 ```bash
-$ git clone --recurse-submodules git@gitlab.prostoksi.com:ddots/ddots-api-server.git
+$ git clone --recurse-submodules https://github.com/frol/ddots-api-server.git
 ```
 
 
@@ -46,6 +46,35 @@ Run Server
 ```bash
 $ invoke app.run
 ```
+
+
+Run SeaweedFS
+-------------
+
+DDOTS API Server uses [SeaweedFS](https://github.com/chrislusf/seaweedfs) to
+store tests for problems and solution source codes. Thus, SeaweedFS is
+required.
+
+You may run SeaweedFS locally following
+[the official documentation](https://github.com/chrislusf/seaweedfs#example-usage),
+or you may use Docker containers, in which case you may use Docker Compose
+(its config is in `deploy/docker-compose.yml`).
+
+
+Run DDOTS with SeaweedFS in Docker Containers
+---------------------------------------------
+
+You should have Docker and Docker Compose installed on your computer. Once that
+is in place, run the following commands:
+
+```bash
+$ cd ./deploy
+$ docker-compose up --build
+```
+
+You will need to edit `deploy/docker-compose.yml` if you want to enable
+persistent storage (otherwise, updating/recreating Docker containers will wipe
+all the data). Follow the instructions in the `docker-compose.yml` file.
 
 
 Quickstart
