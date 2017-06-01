@@ -14,7 +14,7 @@ from .http_exceptions import abort
 
 
 api_v1 = Api( # pylint: disable=invalid-name
-    version='1.0',
+    version='1.x.y',
     title="DDOTS RESTful API Server",
     description=(
         "## Explore the demo server\n\n"
@@ -50,5 +50,6 @@ def init_app(app, **kwargs):
     """
     app.route('/swaggerui/<path:path>')(serve_swaggerui_assets)
 
+    api_v1.version = app.config['VERSION']
     # Prevent config variable modification with runtime changes
     api_v1.authorizations = deepcopy(app.config['AUTHORIZATIONS'])

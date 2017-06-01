@@ -1,0 +1,6 @@
+{
+  "projectName": "ddots-client",
+  "moduleName": "DDOTS",
+  "projectLicenseName": "MIT",
+  "usePromises": true
+}

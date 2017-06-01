@@ -11,6 +11,7 @@ class BaseConfig(object):
 
     DEBUG = False
     ERROR_404_HELP = False
+    VERSION = os.environ.get('DDOTS_VERSION', '1.x.y')
 
     AUTHORIZATIONS = {
         'oauth2_password': {

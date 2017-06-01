@@ -50,4 +50,5 @@ docs/_build/
 local_config.py
 static/
 ddots.db
-.idea/
+clients/*/dist
+clients/*/swagger.json

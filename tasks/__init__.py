@@ -59,12 +59,6 @@ else:
 from invoke import Collection, run, Failure
 from invoke.executor import Executor
 
-from . import app
-
-# NOTE: `namespace` or `ns` name is required!
-namespace = Collection(
-    app,
-)
 
 def invoke_execute(context, command_name, **kwargs):
     """
@@ -74,6 +68,8 @@ def invoke_execute(context, command_name, **kwargs):
     target_task = context.root_namespace[command_name]
     return results[target_task]
 
+# NOTE: `namespace` or `ns` name is required!
+namespace = Collection()
 namespace.configure({
     'run': {
         'shell': '/bin/sh' if platform.system() != 'Windows' else os.environ.get('COMSPEC'),
@@ -81,6 +77,7 @@ namespace.configure({
     'root_namespace': namespace,
     'invoke_execute': invoke_execute,
 })
+
 
 if not os.environ.get('DDOTS_VERSION'):
     try:
@@ -93,3 +90,7 @@ if not os.environ.get('DDOTS_VERSION'):
         pass
     else:
         os.environ['DDOTS_VERSION'] = latest_git_tag
+
+
+from . import app  # pylint: disable=wrong-import-order
+namespace.add_collection(app)
