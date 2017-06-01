@@ -22,7 +22,7 @@ import sqlalchemy
 from app.extensions import api, db
 
 
-log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+log = logging.getLogger(__name__)
 
 
 class OAuth2RequestValidator(provider.OAuth2RequestValidator):
@@ -70,7 +70,6 @@ class OAuth2RequestValidator(provider.OAuth2RequestValidator):
                 )
                 db.session.add(token_instance)
         except sqlalchemy.exc.IntegrityError:
-            db.session.rollback()
             log.exception("Token-setter has failed.")
             return None
         return token_instance
@@ -92,7 +91,6 @@ class OAuth2RequestValidator(provider.OAuth2RequestValidator):
                 )
                 db.session.add(grant_instance)
         except sqlalchemy.exc.IntegrityError:
-            db.session.rollback()
             log.exception("Grant-setter has failed.")
             return None
         return grant_instance

@@ -23,7 +23,7 @@ from flask_marshmallow import Marshmallow
 marshmallow = Marshmallow()
 
 from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy(session_options={'autocommit': True, 'autoflush': False})
+db = SQLAlchemy(session_options={'autocommit': True})
 
 from .flask_seaweedfs import SeaweedFS
 seaweedfs = SeaweedFS()
