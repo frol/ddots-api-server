@@ -206,7 +206,7 @@ class SolutionTestingReportByID(Resource):
         Send a testing report for the solution.
         """
         if Solution.query\
-                .filter(Solution.state == Solution.States.reserved)\
+                .filter(Solution.state == Solution.States.received)\
                 .filter(Solution.id == solution.id)\
                 .update({
                     'state': Solution.States.tested,
@@ -219,7 +219,7 @@ class SolutionTestingReportByID(Resource):
                     default_error_message="Failed to save the testing report"
                 ):
                 solution.testing_report_seaweed_id = seaweedfs.upload_file(
-                        stream=schemas.SolutionTestingReportSchema().dumps(args),
+                        stream=schemas.SolutionTestingReportSchema().dumps(args).data,
                         name="solution_%d-testing_report.json" % solution.id
                     )
                 db.session.merge(solution)

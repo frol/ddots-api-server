@@ -4,6 +4,7 @@ Solutions database models
 -------------------------
 """
 import enum
+import json
 import logging
 import uuid
 
@@ -154,4 +155,4 @@ class Solution(OwnerMixin, db.Model, Timestamp):
         if not seaweedfs.file_exists(self.testing_report_seaweed_id):
             log.error("Testing report is missing for solution #%d", self.id)
             return None
-        return seaweedfs.get_file(self.testing_report_seaweed_id)
+        return json.loads(seaweedfs.get_file(self.testing_report_seaweed_id))

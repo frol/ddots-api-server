@@ -27,6 +27,7 @@ class TestingSolutionSchema(ModelSchema):
 
     class Meta:
         model = Solution
+        include_fk = True
         fields = (
                 Solution.id.key,
                 Solution.problem_id.key,
@@ -70,7 +71,7 @@ class SolutionTestingReportTestSchema(Schema):
 class SolutionTestingReportSchema(Schema):
     status = base_fields.String()
     message = base_fields.String()
-    tests = base_fields.Nested(SolutionTestingReportTestSchema(many=True))
+    tests = base_fields.Nested(SolutionTestingReportTestSchema, many=True)
 
 
 class DetailedSolutionSchema(BaseSolutionSchema):

@@ -5,7 +5,7 @@ Input arguments (Parameters) for Solution resources RESTful API
 """
 
 from flask_marshmallow import base_fields
-from flask_restplus_patched import PostFormParameters, PatchJSONParameters
+from flask_restplus_patched import Parameters, PostFormParameters, PatchJSONParameters
 from marshmallow import validates, ValidationError
 
 from app.modules.problems.models import Problem
@@ -64,7 +64,7 @@ class PatchSolutionDetailsParameters(PatchJSONParameters):
 
 
 class CreateSolutionTestingReportParameters(
-        PostFormParameters,
+        Parameters,
         schemas.SolutionTestingReportSchema
     ):
     pass
