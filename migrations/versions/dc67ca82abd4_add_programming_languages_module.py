@@ -21,7 +21,7 @@ def upgrade():
         sa.Column('version', sa.String(length=20), nullable=False),
         sa.Column('compiler_docker_image_name', sa.String(length=255), nullable=False),
         sa.Column('executor_docker_image_name', sa.String(length=255), nullable=False),
-        sa.PrimaryKeyConstraint('name', 'title')
+        sa.PrimaryKeyConstraint('name')
     )
 
 

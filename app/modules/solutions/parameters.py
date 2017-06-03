@@ -20,6 +20,7 @@ class UploadSolutionParameters(PostFormParameters):
 
     class Meta(schemas.BaseSolutionSchema.Meta):
         model = Solution
+        include_fk = True
         fields = (
             Solution.problem_id.key,
             Solution.programming_language_name.key,

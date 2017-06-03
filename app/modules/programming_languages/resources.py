@@ -60,16 +60,17 @@ class ProgrammingLanguages(Resource):
     code=HTTPStatus.NOT_FOUND,
     description="Programming language not found.",
 )
-@api.resolve_object_by_model(ProgrammingLanguage, 'programming_language')
+@api.resolve_object_by_model(
+    ProgrammingLanguage,
+    'programming_language',
+    'programming_language_name'
+)
 class ProgrammingLanguageByName(Resource):
     """
     Manipulations with a specific programming language.
     """
 
-    @api.permission_required(
-        permissions.OwnerRolePermission,
-        kwargs_on_request=lambda kwargs: {'obj': kwargs['programming_language']}
-    )
+    @api.permission_required(permissions.AdminRolePermission())
     @api.response(schemas.DetailedProgrammingLanguageSchema())
     def get(self, programming_language):
         """
@@ -78,10 +79,7 @@ class ProgrammingLanguageByName(Resource):
         return programming_language
 
     @api.login_required(oauth_scopes=['programming_languages:write'])
-    @api.permission_required(
-        permissions.OwnerRolePermission,
-        kwargs_on_request=lambda kwargs: {'obj': kwargs['programming_language']}
-    )
+    @api.permission_required(permissions.AdminRolePermission())
     @api.permission_required(permissions.WriteAccessPermission())
     @api.parameters(parameters.PatchProgrammingLanguageDetailsParameters())
     @api.response(schemas.DetailedProgrammingLanguageSchema())
@@ -102,10 +100,7 @@ class ProgrammingLanguageByName(Resource):
         return programming_language
 
     @api.login_required(oauth_scopes=['programming_languages:write'])
-    @api.permission_required(
-        permissions.OwnerRolePermission,
-        kwargs_on_request=lambda kwargs: {'obj': kwargs['ProgrammingLanguage']}
-    )
+    @api.permission_required(permissions.AdminRolePermission())
     @api.permission_required(permissions.WriteAccessPermission())
     @api.response(code=HTTPStatus.CONFLICT)
     @api.response(code=HTTPStatus.NO_CONTENT)
