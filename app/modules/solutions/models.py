@@ -37,7 +37,7 @@ class Solution(OwnerMixin, db.Model, Timestamp):
         )
 
     programming_language_name = db.Column(
-            db.Integer,
+            db.String(length=20),
             db.ForeignKey(ProgrammingLanguage.name),
             nullable=False
         )

@@ -21,7 +21,7 @@ def upgrade():
         sa.Column('updated', sa.DateTime(), nullable=False),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('problem_id', sa.Integer(), nullable=False),
-        sa.Column('programming_language_name', sa.Integer(), nullable=False),
+        sa.Column('programming_language_name', sa.String(length=20), nullable=False),
         sa.Column('testing_mode', sa.Enum('one', 'first_fail', 'full', name='testingmodes'), nullable=False),
         sa.Column('state', sa.Enum('new', 'reserved', 'received', 'tested', 'rejected', name='states'), nullable=False),
         sa.Column('status', sqlalchemy_utils.types.scalar_list.ScalarListType(), nullable=False),
