@@ -49,6 +49,7 @@ class Problems(Resource):
     @api.parameters(parameters.CreateProblemParameters())
     @api.response(schemas.DetailedProblemSchema())
     @api.response(code=HTTPStatus.CONFLICT)
+    @api.doc(id='create_problem')
     def post(self, args):
         """
         Create a new problem.

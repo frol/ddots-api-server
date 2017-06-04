@@ -47,6 +47,7 @@ class Solutions(Resource):
     @api.parameters(parameters.UploadSolutionParameters())
     @api.response(schemas.DetailedSolutionSchema())
     @api.response(code=HTTPStatus.CONFLICT)
+    @api.doc(id='send_solution')
     def post(self, args):
         """
         Upload a new solution.
