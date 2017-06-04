@@ -16,9 +16,10 @@ from .models import Solution
 
 class UploadSolutionParameters(PostFormParameters):
 
+    problem_id = base_fields.Integer(required=True)
     source_code = base_fields.String(desciption="Plain text solution source code.", required=True)
 
-    class Meta(schemas.BaseSolutionSchema.Meta):
+    class Meta:
         model = Solution
         include_fk = True
         fields = (
@@ -33,7 +34,10 @@ class UploadSolutionParameters(PostFormParameters):
         # pylint: disable=unused-argument
         problem = Problem.query.filter(Problem.id == problem_id).first()
         if problem is None:
-            raise ValidationError("There is no problem with ID '%s'" % problem_id)
+            raise ValidationError(
+                "There is no problem with ID '%s'" % problem_id,
+                fields=[Solution.problem_id.key]
+            )
 
     @validates(Solution.programming_language_name.key)
     def validate_programming_language_name(self, programming_language_name):
@@ -43,7 +47,8 @@ class UploadSolutionParameters(PostFormParameters):
         ).first()
         if programming_language is None:
             raise ValidationError(
-                "There is no programming language '%s'" % programming_language_name
+                "There is no programming language '%s'" % programming_language_name,
+                fields=[Solution.programming_language_name.key]
             )
 
 
