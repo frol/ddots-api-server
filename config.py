@@ -49,7 +49,7 @@ class BaseConfig(object):
     SWAGGER_UI_OAUTH_APP_NAME = "DDOTS API Server"
 
     SEAWEEDFS_CONFIG = {
-        'MASTER_ADDR': os.getenv('DDOTS_SEAWEEDFS_ADDR', 'localhost'),
+        'MASTER_ADDR': os.getenv('DDOTS_SEAWEEDFS_HOST', 'localhost'),
         'MASTER_PORT': int(os.getenv('DDOTS_SEAWEEDFS_PORT', 9333)),
     }
 
