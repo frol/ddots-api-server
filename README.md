@@ -156,23 +156,25 @@ You can register new OAuth2 clients using the direct calls to the internals
 (SQLAlchemy models):
 
 ```python
+from app import create_app
 from app.extensions import api, db
-from app.modules.auth.model import OAuth2Clients
+from app.modules.auth.models import OAuth2Client
 from werkzeug import security
 
-new_oauth2_client = OAuth2Client(
-    client_id=security.gen_salt(40),
-    client_secret=security.gen_salt(50),
-    user_id=1,
-    redirect_uris=[],
-    default_scopes=api.api_v1.authorizations['oauth2_password']['scopes']
-)
-with db.session.begin():
-    db.session.add(new_oauth2_client)
+with create_app().app_context():
+    new_oauth2_client = OAuth2Client(
+        client_id=security.gen_salt(40),
+        client_secret=security.gen_salt(50),
+        user_id=1,
+        redirect_uris=[],
+        default_scopes=api.api_v1.authorizations['oauth2_password']['scopes']
+    )
+    with db.session.begin():
+        db.session.add(new_oauth2_client)
 
-print("New OAuth2 client:")
-print("  CLIENT ID:", new_oauth2_client.client_id)
-print("  CLIENT SECRET:", new_oauth2_client.client_secret)
+    print("New OAuth2 client:")
+    print("  CLIENT ID:", new_oauth2_client.client_id)
+    print("  CLIENT SECRET:", new_oauth2_client.client_secret)
 ```
 
 However, you might be more interested to do that via the RESTful API which does
@@ -293,17 +295,20 @@ There are four ways to achive that:
 * Using DDOTS API Server internals:
 
     ```python
+    from app import create_app
     from app.extensions import db
     from app.modules.problems.model import Problem
 
-    new_problem = Problem(
-        creator_id=1,
-        title="New Problem",
-        tests_archive=open('problem-tests-archive.tar.gz')
-    )
-    with db.session.begin():
-        db.session.add(new_problem)
-    print("New Problem ID is %d" % new_problem.id)
+    with create_app().app_context():
+        new_problem = Problem(
+            creator_id=1,
+            title="New Problem",
+            tests_archive=open('problem-tests-archive.tar.gz')
+        )
+        with db.session.begin():
+            db.session.add(new_problem)
+
+        print("New Problem ID is %d" % new_problem.id)
     ```
 * Using the built-in Swagger UI (http://127.0.0.1:5000/api/v1/), navigate to
   "Problems" -> "Create a new problem", and fill the form (don't forget to
@@ -351,29 +356,32 @@ The expected output is JSON of the following structure:
 
 ### Solutions
 
-NOTE: You will see magic `programming_language_name` codes. It is a legacy DOTS
-server implementation, so to shortcut it, I left it alone for now, see the
-[`migrations/initial_delevelopment_data.py`](./migrations/initial_development_data.py)
-to learn other programming languages codes.
+NOTE: You will see a use of `programming_language_name` below. Currently, they
+are hardcoded on the Testing System, so you have to use the registered names;
+there is a list of them in
+[`migrations/initial_delevelopment_data.py`](./migrations/initial_development_data.py).
 
-Similarly to the Problems, you can add new solutions into the system:
+Similarly to the Problems API, you can add new solutions into the system:
 
 * Using direct interaction with internals (SQLAlchemy models):
 
     ```python
+    from app import create_app
     from app.extensions import db
     from app.modules.solutions.model import Solution
 
-    new_solution = Solution(
-        author_id=1,
-        problem_id=1,
-        programming_language_name='39',  # Delphi
-        testing_mode='full',  # Other options: "one", "first_fail"
-        source_code="""begin writeln('Hello World!'); end."""
-    )
-    with db.session.begin():
-        db.session.add(new_solution)
-    print("New Solution ID is %d" % new_solution.id)
+    with create_app().app_context():
+        new_solution = Solution(
+            author_id=1,
+            problem_id=1,
+            programming_language_name='delphi-fpc',  # Delphi
+            testing_mode='full',  # Other options: "one", "first_fail"
+            source_code="""begin writeln('Hello World!'); end."""
+        )
+        with db.session.begin():
+            db.session.add(new_solution)
+
+        print("New Solution ID is %d" % new_solution.id)
     ```
 * Using the built-in Swagger UI (http://127.0.0.1:5000/api/v1/), navigate to
   "Solutions" -> "Upload a new solution", and fill the form (don't forget to
@@ -395,7 +403,7 @@ Similarly to the Problems, you can add new solutions into the system:
     print("New Solution response:")
     print(solutions_api.send_solution(
         problem_id=1,
-        programming_language_name='39',  # Delphi
+        programming_language_name='delphi-fpc',  # Delphi
         testing_mode='full',  # Other options: "one", "first_fail"
         source_code="""begin writeln('Hello World!'); end."""
     ))
@@ -408,7 +416,7 @@ Similarly to the Problems, you can add new solutions into the system:
         --header 'Accept: application/json' \
         --header "Authorization: Bearer $ACCESS_TOKEN" \
         -F 'problem_id=1' \
-        -F 'programming_language_name=39' \
+        -F 'programming_language_name=delphi-fpc' \
         -F 'testing_mode=full' \
         -F "source_code=begin writeln('Hello World!'); end." \
         'http://127.0.0.1:5000/api/v1/solutions/'
@@ -432,7 +440,7 @@ The expected output is JSON of the following structure:
         "title": "New Problem"
     },
     "programming_language": {
-        "name": "39",
+        "name": "delphi-fpc",
         "title": "Delphi / FreePascal",
         "version": ""
     },
@@ -471,7 +479,7 @@ curl \
         "title": "New Problem"
     },
     "programming_language": {
-        "name": "39",
+        "name": "delphi-fpc",
         "title": "Delphi / FreePascal",
         "version": ""
     },
