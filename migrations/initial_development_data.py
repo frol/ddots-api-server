@@ -70,7 +70,7 @@ def init_programming_languages():
             ProgrammingLanguage(
                 name='c89-gcc',
                 title="C (C99) / GCC",
-                compiler_docketr_image_name='ddots-compiler-c89-gcc',
+                compiler_docker_image_name='ddots-compiler-c89-gcc',
                 executor_docker_image_name='ddots-executor-binary',
             ),
             ProgrammingLanguage(
