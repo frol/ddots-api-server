@@ -4,8 +4,8 @@
 RESTful API ProgrammingLanguages resources
 -------------------------------
 """
+from flask_restplus._http import HTTPStatus
 from flask_restplus_patched import Resource
-from flask_restplus_patched._http import HTTPStatus
 
 from app.extensions import db
 from app.extensions.api import Namespace

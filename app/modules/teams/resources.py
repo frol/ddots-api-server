@@ -8,8 +8,8 @@ RESTful API Team resources
 import logging
 
 from flask_login import current_user
-from flask_restplus_patched import Resource
 from flask_restplus._http import HTTPStatus
+from flask_restplus_patched import Resource
 
 from app.extensions import db
 from app.extensions.api import Namespace, abort
